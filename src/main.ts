@@ -164,7 +164,22 @@ const sketch = (p: p5) => {
 			HEIGHT / 2 - 15,
 		);
 
-		// TODO: make tan axis extend after reaching |y=1|
+		// Make tan axis extend after reaching |y=1|
+		if (tanPointY <= HEIGHT / 2 - CIRCLE_RADIUS + 15) {
+			dashedLine(
+				tanPointX,
+				HEIGHT / 2 - CIRCLE_RADIUS,
+				tanPointX,
+				tanPointY - 20 * taylorTan(rad),
+			);
+		} else if (tanPointY >= HEIGHT / 2 + CIRCLE_RADIUS - 15) {
+			dashedLine(
+				tanPointX,
+				HEIGHT / 2 + CIRCLE_RADIUS,
+				tanPointX,
+				tanPointY - 20 * taylorTan(rad),
+			);
+		}
 	};
 
 	const drawGraphs = (angle: number) => {
