@@ -52,8 +52,12 @@ const sketch = (p: p5) => {
 	let angle: number = 0;
 
 	p.setup = () => {
-		p.createCanvas(WIDTH, HEIGHT);
+		p.createCanvas(p.windowWidth, p.windowHeight);
 		p.angleMode(p.DEGREES);
+	};
+
+	p.windowResized = () => {
+		p.resizeCanvas(p.windowWidth, p.windowHeight);
 	};
 
 	p.draw = () => {
@@ -73,7 +77,6 @@ const sketch = (p: p5) => {
 	};
 
 	const drawTexts = () => {
-		// Display current angle at top center
 		p.fill(255);
 		p.textSize(24);
 		p.textAlign(p.CENTER, p.TOP);
@@ -116,8 +119,8 @@ const sketch = (p: p5) => {
 		dashedLine(
 			pointX,
 			pointY,
-			WIDTH / 4 + CIRCLE_RADIUS,
-			HEIGHT / 2 - CIRCLE_RADIUS * taylorTan(rad),
+			WIDTH / 4 + CIRCLE_RADIUS + 20,
+			HEIGHT / 2 - (CIRCLE_RADIUS + 20) * taylorTan(rad),
 		);
 
 		// Draw points
@@ -125,15 +128,14 @@ const sketch = (p: p5) => {
 		p.fill('white');
 		p.circle(pointX, pointY, 10);
 
-		p.fill('orange');
+		p.fill('#6fa');
 		p.circle(pointX, HEIGHT / 2, 10);
 
 		p.fill('#fae');
 		p.circle(WIDTH / 4, pointY, 10);
 
 		const tanPointX = WIDTH / 4 + CIRCLE_RADIUS;
-		const tanPointY =
-			HEIGHT / 2 - (CIRCLE_RADIUS * taylorSin(rad)) / taylorCos(rad);
+		const tanPointY = HEIGHT / 2 - CIRCLE_RADIUS * taylorTan(rad);
 		p.colorMode(p.HSB, 100);
 		p.fill(p.color(50, 55, 100));
 		p.circle(tanPointX, tanPointY, 10);
@@ -142,11 +144,27 @@ const sketch = (p: p5) => {
 		p.stroke(128);
 		p.strokeWeight(1);
 		dashedLine(
-			WIDTH / 4 + CIRCLE_RADIUS, // x1
-			HEIGHT / 2 - 350, // y1 (top of the screen)
-			WIDTH / 4 + CIRCLE_RADIUS, // x2
-			HEIGHT / 2 + 350, // y2 (bottom of the screen)
+			tanPointX,
+			HEIGHT / 2 - CIRCLE_RADIUS,
+			tanPointX,
+			HEIGHT / 2 + CIRCLE_RADIUS,
 		);
+
+		p.stroke(255);
+		dashedLine(
+			WIDTH / 4 + CIRCLE_RADIUS - 15,
+			HEIGHT / 2 - 15,
+			WIDTH / 4 + CIRCLE_RADIUS,
+			HEIGHT / 2 - 15,
+		);
+		dashedLine(
+			WIDTH / 4 + CIRCLE_RADIUS - 15,
+			HEIGHT / 2,
+			WIDTH / 4 + CIRCLE_RADIUS - 15,
+			HEIGHT / 2 - 15,
+		);
+
+		// TODO: make tan axis extend after reaching |y=1|
 	};
 
 	const drawGraphs = (angle: number) => {
@@ -162,23 +180,32 @@ const sketch = (p: p5) => {
 		// Draw sine and cosine curves
 		drawSineCurve(graphX, graphY);
 		drawCosineCurve(graphX, graphY);
+		drawTanCurve(graphX, graphY);
 
 		// Draw moving line and points
 		const lineX = p.map(angle, 0, 360, graphX, graphX + GRAPH_PERIOD);
 		p.stroke(128);
 		p.line(lineX, graphY - GRAPH_AMPLITUDE, lineX, graphY + GRAPH_AMPLITUDE);
 
-		const radians = p.radians(angle);
+		const rad = p.radians(angle);
 
-		const cosY = graphY - GRAPH_AMPLITUDE * taylorCos(radians);
-		const sinY = graphY - GRAPH_AMPLITUDE * taylorSin(radians);
+		const cosY = graphY - GRAPH_AMPLITUDE * taylorCos(rad);
+		const sinY = graphY - GRAPH_AMPLITUDE * taylorSin(rad);
+		const tanY = graphY - GRAPH_AMPLITUDE * taylorTan(rad);
 
+		// sin(x) - Pink
 		p.noStroke();
-		p.fill('orange');
-		p.circle(lineX, cosY, 10);
-
 		p.fill('#fae');
 		p.circle(lineX, sinY, 10);
+
+		// cos(x) - Muted Green
+		p.fill('#6fa');
+		p.circle(lineX, cosY, 10);
+
+		// tan(x) - Bright Blue
+		p.colorMode(p.HSB, 100);
+		p.fill(p.color(50, 55, 100)); // Or use HEX: p.fill('#0af');
+		p.circle(lineX, tanY, 10);
 	};
 
 	const drawSineCurve = (startX: number, startY: number) => {
@@ -196,12 +223,26 @@ const sketch = (p: p5) => {
 
 	const drawCosineCurve = (startX: number, startY: number) => {
 		p.noFill();
-		p.stroke('orange');
+		p.stroke('#6fa');
 		p.beginShape();
 		for (let t = 0; t <= 360; t++) {
 			const rad = p.radians(t);
 			const x = p.map(t, 0, 360, startX, startX + GRAPH_PERIOD);
 			const y = startY - GRAPH_AMPLITUDE * taylorCos(rad);
+			p.vertex(x, y);
+		}
+		p.endShape();
+	};
+
+	const drawTanCurve = (startX: number, startY: number) => {
+		p.noFill();
+		p.colorMode(p.HSB, 100);
+		p.stroke(p.color(50, 55, 100));
+		p.beginShape();
+		for (let t = 0; t <= 360; t++) {
+			const rad = p.radians(t);
+			const x = p.map(t, 0, 360, startX, startX + GRAPH_PERIOD);
+			const y = startY - GRAPH_AMPLITUDE * taylorTan(rad);
 			p.vertex(x, y);
 		}
 		p.endShape();
