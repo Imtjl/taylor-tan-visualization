@@ -30,8 +30,7 @@ function taylorCos(x: number, terms: number = 10): number {
 
 function taylorTan(x: number, terms: number = 10): number {
 	const cosX: number = taylorCos(x, terms);
-	if (Math.abs(cosX) < 1e-10) {
-		// throw new Error('tan(x) is undefined (cos(x) is close to 0).');
+	if (Math.abs(cosX) < 1e-3) {
 		return NaN;
 	}
 	const sinX: number = taylorSin(x, terms);
@@ -206,7 +205,11 @@ const sketch = (p: p5) => {
 
 		const cosY = graphY - GRAPH_AMPLITUDE * taylorCos(rad);
 		const sinY = graphY - GRAPH_AMPLITUDE * taylorSin(rad);
-		const tanY = graphY - GRAPH_AMPLITUDE * taylorTan(rad);
+		let tanY = graphY - GRAPH_AMPLITUDE * taylorTan(rad);
+
+		if (isNaN(tanY) || Math.abs(tanY) > HEIGHT * 2) {
+			tanY = graphY; // Default to the center if tanY is invalid
+		}
 
 		// sin(x) - Pink
 		p.noStroke();
