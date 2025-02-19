@@ -2,10 +2,13 @@ import p5 from 'p5';
 import { taylorCos, taylorSin, taylorTan } from './math';
 import { dashedCircle, dashedLine, initUtils } from './p5-utils';
 
-// Constants
-const CIRCLE_RADIUS = 100;
-const GRAPH_AMPLITUDE = 50;
-const GRAPH_PERIOD = 300;
+// Global variables
+let CIRCLE_RADIUS = 100;
+const CIRCLE_RADIUS_BASE = 100;
+let GRAPH_AMPLITUDE = 50;
+const GRAPH_AMPLITUDE_BASE = 50;
+let GRAPH_PERIOD = 300;
+const GRAPH_PERIOD_BASE = 300;
 
 // p5.js sketch
 const sketch = (p: p5) => {
@@ -16,24 +19,22 @@ const sketch = (p: p5) => {
 	let cY: number; // screen center Y
 	let OX: number; // circle center X
 	let OY: number; // circle center Y
+	let gX: number; // graph center X
+	let gY: number; // graph center Y
+	let yScale: number; // scale sketch vertically
+	let xScale: number; // scale sketch horizontally
 
 	p.setup = () => {
 		p.createCanvas(p.windowWidth, p.windowHeight);
 		p.angleMode(p.DEGREES);
 		initUtils(p);
 		updatePositions();
+		updatePositions();
 	};
 
 	p.windowResized = () => {
 		p.resizeCanvas(p.windowWidth, p.windowHeight);
 		updatePositions();
-	};
-
-	const updatePositions = () => {
-		cX = p.width / 2;
-		cY = p.height / 2;
-		OX = cX - 150;
-		OY = cY;
 	};
 
 	p.draw = () => {
@@ -135,8 +136,8 @@ const sketch = (p: p5) => {
 	};
 
 	const drawGraphs = (deg: number) => {
-		const graphX = cX;
-		const graphY = cY;
+		const graphX = gX;
+		const graphY = gY;
 
 		// Draw axes
 		p.stroke(128);
@@ -181,7 +182,7 @@ const sketch = (p: p5) => {
 		p.beginShape();
 		for (let t = 0; t <= 360; t++) {
 			const rad = p.radians(t);
-			const x = p.map(rad, 0, 360, startX, startX + GRAPH_PERIOD + 17000);
+			const x = p.map(t, 0, 360, startX, startX + GRAPH_PERIOD);
 			const y = startY - GRAPH_AMPLITUDE * taylorSin(rad);
 			p.vertex(x, y);
 		}
@@ -260,6 +261,67 @@ const sketch = (p: p5) => {
 			}
 		}
 		p.endShape();
+	};
+
+	/**
+	 * hardcode for responsive design
+	 * please, don't read it, it was just a simple solution to a hard problem
+	 * ideally want to make interpolation function for smooth resizing, but who cares
+	 */
+	const updatePositions = () => {
+		if (p.windowWidth < 580) {
+			cX = p.width / 2;
+			cY = p.height / 2;
+			OX = cX;
+			OY = cY - p.height * 0.28;
+			gX = cX - GRAPH_PERIOD / 2;
+			gY = cY + p.height * 0.18;
+			yScale = 0.9;
+			xScale = 1.1;
+		} else if (p.windowWidth < 645) {
+			yScale = 1;
+			xScale = 1;
+			cX = p.width / 2.2;
+			cY = p.height / 2;
+			OX = cX - p.width * 0.23;
+			OY = cY;
+			gX = cX;
+			gY = cY;
+		} else if (p.windowWidth < 720) {
+			yScale = 1.05;
+			xScale = 1.4;
+			cX = p.width / 2.1;
+			cY = p.height / 2;
+			OX = cX - p.width * 0.23;
+			OY = cY;
+			gX = cX;
+			gY = cY;
+		} else if (p.windowWidth < 1200) {
+			yScale = 1.2;
+			xScale = 1.2;
+			cX = p.width / 2;
+			cY = p.height / 2;
+			OX = cX - p.width * 0.23;
+			OY = cY;
+			gX = cX;
+			gY = cY;
+		} else if (p.windowWidth < 1800) {
+			yScale = 1.5;
+			xScale = 1.2;
+			cX = p.width / 1.7;
+			cY = p.height / 2;
+			OX = cX - p.width * 0.23;
+			OY = cY;
+			gX = cX;
+			gY = cY;
+		} else {
+			yScale = 2;
+			xScale = 1.1;
+			cX = p.width / 2;
+		}
+		CIRCLE_RADIUS = CIRCLE_RADIUS_BASE * yScale;
+		GRAPH_AMPLITUDE = GRAPH_AMPLITUDE_BASE * yScale;
+		GRAPH_PERIOD = GRAPH_PERIOD_BASE * xScale;
 	};
 };
 
