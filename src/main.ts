@@ -194,12 +194,59 @@ const sketch = (p: p5) => {
 		p.noFill();
 		p.colorMode(p.HSB, 100);
 		p.stroke(p.color(50, 55, 100));
+
+		// y-range for the tan(x) graph
+		const yMin = -5;
+		const yMax = 5;
+
+		// asymptotes at x = -π/2 and x = π/2
+		const as1X = startX + GRAPH_PERIOD / 4;
+		const as2X = startX + (GRAPH_PERIOD * 3) / 4;
+
+		p.stroke(128);
+		p.strokeWeight(1);
+		dashedLine(
+			as1X,
+			startY + yMin * GRAPH_AMPLITUDE + 15,
+			as1X,
+			startY + yMax * (GRAPH_AMPLITUDE - 2),
+		);
+		dashedLine(
+			as2X,
+			startY + yMin * GRAPH_AMPLITUDE + 15,
+			as2X,
+			startY + yMax * GRAPH_AMPLITUDE - 10,
+		);
+
+		// tan(x)
+		p.stroke(p.color(50, 55, 100)); // bright blue
 		p.beginShape();
 		for (let t = 0; t <= 360; t++) {
 			const rad = p.radians(t);
 			const x = p.map(t, 0, 360, startX, startX + GRAPH_PERIOD);
+
+			// Skip drawing near asymptotes
+			if (
+				Math.abs(rad + Math.PI / 2) < 1e-3 ||
+				Math.abs(rad - Math.PI / 2) < 1e-3
+			) {
+				p.endShape();
+				p.beginShape();
+				continue;
+			}
+
 			const y = startY - GRAPH_AMPLITUDE * taylorTan(rad);
-			p.vertex(x, y);
+
+			// Clip the y-values to the defined range
+			if (
+				y >= startY + yMin * GRAPH_AMPLITUDE &&
+				y <= startY + yMax * GRAPH_AMPLITUDE
+			) {
+				p.vertex(x, y);
+			} else {
+				p.endShape();
+				p.beginShape();
+			}
 		}
 		p.endShape();
 	};
