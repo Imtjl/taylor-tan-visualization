@@ -50,8 +50,9 @@ const sketch = (p: p5) => {
 	const drawTexts = () => {
 		p.fill(255);
 		p.textSize(24);
-		p.textAlign(p.CENTER, p.TOP);
-		p.text(`angle: ${deg.toFixed(0)}°`, cX, 10);
+		// p.textAlign(p.CENTER, p.TOP);
+		const text = `∡ψ: ${deg.toFixed(0)}°`;
+		p.text(text, cX - p.textWidth(text) / 2, 35);
 	};
 
 	const drawUnitCircle = (deg: number) => {
@@ -60,12 +61,28 @@ const sketch = (p: p5) => {
 		p.strokeWeight(2);
 		dashedCircle(OX, OY, 2 * CIRCLE_RADIUS);
 
-		// Draw diameters
+		// diameters
 		p.line(OX, OY - CIRCLE_RADIUS, OX, OY + CIRCLE_RADIUS);
 		p.line(OX - CIRCLE_RADIUS, OY, OX + CIRCLE_RADIUS, OY);
 
-		// Draw moving points
+		// moving points
 		drawUnitCircleMovingPoints(deg);
+
+		// moving angle
+		drawUnitCircleMovingAngle(deg);
+	};
+
+	const drawUnitCircleMovingAngle = (deg: number) => {
+		p.colorMode(p.RGB, 255, 255, 255, 1);
+		p.fill(255, 255, 255, 0.1);
+		p.noStroke();
+		p.arc(OX, OY, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2, -deg, (deg % 90) - deg);
+
+		p.fill(255, 255, 255, 0.2);
+		p.colorMode(p.HSB, 100);
+		p.stroke(128);
+		p.strokeWeight(2);
+		p.arc(OX, OY, CIRCLE_RADIUS * 0.5, CIRCLE_RADIUS * 0.5, -deg, 0);
 	};
 
 	const drawUnitCircleMovingPoints = (deg: number) => {
