@@ -1,4 +1,6 @@
 import p5 from 'p5';
+import { taylorCos, taylorSin, taylorTan } from './math';
+import { dashedCircle, dashedLine, initUtils } from './p5-utils';
 
 // Constants
 const WIDTH = 800;
@@ -6,53 +8,17 @@ const HEIGHT = 600;
 const CIRCLE_RADIUS = 100;
 const GRAPH_AMPLITUDE = 50;
 const GRAPH_PERIOD = 300;
-
-// Taylor series functions
-function taylorSin(x: number, terms: number = 10): number {
-	let result: number = 0;
-	for (let n: number = 0; n < terms; n++) {
-		const numerator: number = (-1) ** n * x ** (2 * n + 1);
-		const denominator: number = factorial(2 * n + 1);
-		result += numerator / denominator;
-	}
-	return result;
-}
-
-function taylorCos(x: number, terms: number = 10): number {
-	let result: number = 0;
-	for (let n: number = 0; n < terms; n++) {
-		const numerator: number = (-1) ** n * x ** (2 * n);
-		const denominator: number = factorial(2 * n);
-		result += numerator / denominator;
-	}
-	return result;
-}
-
-function taylorTan(x: number, terms: number = 10): number {
-	const cosX: number = taylorCos(x, terms);
-	if (Math.abs(cosX) < 1e-3) {
-		return NaN;
-	}
-	const sinX: number = taylorSin(x, terms);
-	return sinX / cosX;
-}
-
-function factorial(n: number): number {
-	if (n === 0 || n === 1) return 1;
-	let result: number = 1;
-	for (let i: number = 2; i <= n; i++) {
-		result *= i;
-	}
-	return result;
-}
+const OX = WIDTH / 4;
+const OY = HEIGHT / 2;
 
 // p5.js sketch
 const sketch = (p: p5) => {
-	let angle: number = 0;
+	let deg: number = 0;
 
 	p.setup = () => {
 		p.createCanvas(p.windowWidth, p.windowHeight);
 		p.angleMode(p.DEGREES);
+		initUtils(p);
 	};
 
 	p.windowResized = () => {
@@ -62,15 +28,9 @@ const sketch = (p: p5) => {
 	p.draw = () => {
 		p.background(0);
 
-		// Update angle
-		angle = (p.frameCount % 1440) / 4;
-
-		// Draw circle and moving point
-		drawCircle();
-		drawMovingPoint(angle);
-
-		// Draw graphs
-		drawGraphs(angle);
+		deg = (p.frameCount % 1440) / 4;
+		drawUnitCircle(deg);
+		drawGraphs(deg);
 
 		drawTexts();
 	};
@@ -79,109 +39,91 @@ const sketch = (p: p5) => {
 		p.fill(255);
 		p.textSize(24);
 		p.textAlign(p.CENTER, p.TOP);
-		p.text(`angle: ${angle.toFixed(0)}°`, WIDTH / 2, 10);
+		p.text(`angle: ${deg.toFixed(0)}°`, WIDTH / 2, 10);
 	};
 
-	const drawCircle = () => {
+	const drawUnitCircle = (deg: number) => {
 		p.noFill();
 		p.stroke(128);
 		p.strokeWeight(2);
-		p.circle(WIDTH / 4, HEIGHT / 2, 2 * CIRCLE_RADIUS);
+		dashedCircle(OX, OY, 2 * CIRCLE_RADIUS);
 
 		// Draw diameters
-		p.line(
-			WIDTH / 4,
-			HEIGHT / 2 - CIRCLE_RADIUS,
-			WIDTH / 4,
-			HEIGHT / 2 + CIRCLE_RADIUS,
-		);
-		p.line(
-			WIDTH / 4 - CIRCLE_RADIUS,
-			HEIGHT / 2,
-			WIDTH / 4 + CIRCLE_RADIUS,
-			HEIGHT / 2,
-		);
+		p.line(OX, OY - CIRCLE_RADIUS, OX, OY + CIRCLE_RADIUS);
+		p.line(OX - CIRCLE_RADIUS, OY, OX + CIRCLE_RADIUS, OY);
+
+		// Draw moving points
+		drawUnitCircleMovingPoints(deg);
 	};
 
-	const drawMovingPoint = (angle: number) => {
-		let rad = p.radians(angle);
-		const pointX = WIDTH / 4 + CIRCLE_RADIUS * taylorCos(rad);
-		const pointY = HEIGHT / 2 - CIRCLE_RADIUS * taylorSin(rad);
+	const drawUnitCircleMovingPoints = (deg: number) => {
+		const rad = p.radians(deg);
+		const pointX = OX + CIRCLE_RADIUS * taylorCos(rad);
+		const pointY = OY - CIRCLE_RADIUS * taylorSin(rad);
 
 		// Draw line from center to point
 		p.stroke(128);
 		p.strokeWeight(2);
-		p.line(WIDTH / 4, HEIGHT / 2, pointX, pointY);
+		p.line(OX, OY, pointX, pointY);
 
 		// Draw dashed line from point to tan(x) line
 		p.strokeWeight(1);
 		dashedLine(
 			pointX,
 			pointY,
-			WIDTH / 4 + CIRCLE_RADIUS + 20,
-			HEIGHT / 2 - (CIRCLE_RADIUS + 20) * taylorTan(rad),
+			OX + CIRCLE_RADIUS + 20,
+			OY - (CIRCLE_RADIUS + 20) * taylorTan(rad),
 		);
 
-		// Draw points
+		// angle moving point
 		p.noStroke();
 		p.fill('white');
 		p.circle(pointX, pointY, 10);
 
+		// cos(x) moving point
 		p.fill('#6fa');
-		p.circle(pointX, HEIGHT / 2, 10);
+		p.circle(pointX, OY, 10);
 
+		// sin(x) moving point
 		p.fill('#fae');
-		p.circle(WIDTH / 4, pointY, 10);
+		p.circle(OX, pointY, 10);
 
-		const tanPointX = WIDTH / 4 + CIRCLE_RADIUS;
-		const tanPointY = HEIGHT / 2 - CIRCLE_RADIUS * taylorTan(rad);
+		// tan(x) moving point
+		const tanPointX = OX + CIRCLE_RADIUS;
+		const tanPointY = OY - CIRCLE_RADIUS * taylorTan(rad);
 		p.colorMode(p.HSB, 100);
 		p.fill(p.color(50, 55, 100));
 		p.circle(tanPointX, tanPointY, 10);
 
-		// Draw dashed tan(x) axis
+		// tan(x) axis
 		p.stroke(128);
 		p.strokeWeight(1);
-		dashedLine(
-			tanPointX,
-			HEIGHT / 2 - CIRCLE_RADIUS,
-			tanPointX,
-			HEIGHT / 2 + CIRCLE_RADIUS,
-		);
+		dashedLine(tanPointX, OY - CIRCLE_RADIUS, tanPointX, OY + CIRCLE_RADIUS);
 
+		// dahed 90 deg angle
 		p.stroke(255);
-		dashedLine(
-			WIDTH / 4 + CIRCLE_RADIUS - 15,
-			HEIGHT / 2 - 15,
-			WIDTH / 4 + CIRCLE_RADIUS,
-			HEIGHT / 2 - 15,
-		);
-		dashedLine(
-			WIDTH / 4 + CIRCLE_RADIUS - 15,
-			HEIGHT / 2,
-			WIDTH / 4 + CIRCLE_RADIUS - 15,
-			HEIGHT / 2 - 15,
-		);
+		dashedLine(OX + CIRCLE_RADIUS - 15, OY - 15, OX + CIRCLE_RADIUS, OY - 15);
+		dashedLine(OX + CIRCLE_RADIUS - 15, OY, OX + CIRCLE_RADIUS - 15, OY - 15);
 
 		// Make tan axis extend after reaching |y=1|
-		if (tanPointY <= HEIGHT / 2 - CIRCLE_RADIUS + 15) {
+		if (tanPointY <= OY - CIRCLE_RADIUS + 15) {
 			dashedLine(
 				tanPointX,
-				HEIGHT / 2 - CIRCLE_RADIUS,
+				OY - CIRCLE_RADIUS,
 				tanPointX,
 				tanPointY - 20 * taylorTan(rad),
 			);
-		} else if (tanPointY >= HEIGHT / 2 + CIRCLE_RADIUS - 15) {
+		} else if (tanPointY >= OY + CIRCLE_RADIUS - 15) {
 			dashedLine(
 				tanPointX,
-				HEIGHT / 2 + CIRCLE_RADIUS,
+				OY + CIRCLE_RADIUS,
 				tanPointX,
 				tanPointY - 20 * taylorTan(rad),
 			);
 		}
 	};
 
-	const drawGraphs = (angle: number) => {
+	const drawGraphs = (deg: number) => {
 		const graphX = WIDTH / 2;
 		const graphY = HEIGHT / 2;
 
@@ -197,19 +139,15 @@ const sketch = (p: p5) => {
 		drawTanCurve(graphX, graphY);
 
 		// Draw moving line and points
-		const lineX = p.map(angle, 0, 360, graphX, graphX + GRAPH_PERIOD);
+		const lineX = p.map(deg, 0, 360, graphX, graphX + GRAPH_PERIOD);
 		p.stroke(128);
 		p.line(lineX, graphY - GRAPH_AMPLITUDE, lineX, graphY + GRAPH_AMPLITUDE);
 
-		const rad = p.radians(angle);
+		const rad = p.radians(deg);
 
 		const cosY = graphY - GRAPH_AMPLITUDE * taylorCos(rad);
 		const sinY = graphY - GRAPH_AMPLITUDE * taylorSin(rad);
 		let tanY = graphY - GRAPH_AMPLITUDE * taylorTan(rad);
-
-		if (isNaN(tanY) || Math.abs(tanY) > HEIGHT * 2) {
-			tanY = graphY; // Default to the center if tanY is invalid
-		}
 
 		// sin(x) - Pink
 		p.noStroke();
@@ -264,27 +202,6 @@ const sketch = (p: p5) => {
 			p.vertex(x, y);
 		}
 		p.endShape();
-	};
-
-	const dashedLine = (
-		x1: number,
-		y1: number,
-		x2: number,
-		y2: number,
-		dashLength = 5,
-		gapLength = 5,
-	) => {
-		let distance = p.dist(x1, y1, x2, y2);
-		let dashCount = distance / (dashLength + gapLength);
-
-		for (let i = 0; i < dashCount; i++) {
-			let t = i / dashCount;
-			let xStart = p.lerp(x1, x2, t);
-			let yStart = p.lerp(y1, y2, t);
-			let xEnd = p.lerp(x1, x2, t + dashLength / distance);
-			let yEnd = p.lerp(y1, y2, t + dashLength / distance);
-			p.line(xStart, yStart, xEnd, yEnd);
-		}
 	};
 };
 
