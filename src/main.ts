@@ -3,26 +3,37 @@ import { taylorCos, taylorSin, taylorTan } from './math';
 import { dashedCircle, dashedLine, initUtils } from './p5-utils';
 
 // Constants
-const WIDTH = 800;
-const HEIGHT = 600;
 const CIRCLE_RADIUS = 100;
 const GRAPH_AMPLITUDE = 50;
 const GRAPH_PERIOD = 300;
-const OX = WIDTH / 4;
-const OY = HEIGHT / 2;
 
 // p5.js sketch
 const sketch = (p: p5) => {
 	let deg: number = 0;
 
+	// dynamically calculate coords
+	let cX: number; // screen center X
+	let cY: number; // screen center Y
+	let OX: number; // circle center X
+	let OY: number; // circle center Y
+
 	p.setup = () => {
 		p.createCanvas(p.windowWidth, p.windowHeight);
 		p.angleMode(p.DEGREES);
 		initUtils(p);
+		updatePositions();
 	};
 
 	p.windowResized = () => {
 		p.resizeCanvas(p.windowWidth, p.windowHeight);
+		updatePositions();
+	};
+
+	const updatePositions = () => {
+		cX = p.width / 2;
+		cY = p.height / 2;
+		OX = cX - 150;
+		OY = cY;
 	};
 
 	p.draw = () => {
@@ -39,7 +50,7 @@ const sketch = (p: p5) => {
 		p.fill(255);
 		p.textSize(24);
 		p.textAlign(p.CENTER, p.TOP);
-		p.text(`angle: ${deg.toFixed(0)}°`, WIDTH / 2, 10);
+		p.text(`angle: ${deg.toFixed(0)}°`, cX, 10);
 	};
 
 	const drawUnitCircle = (deg: number) => {
@@ -124,8 +135,8 @@ const sketch = (p: p5) => {
 	};
 
 	const drawGraphs = (deg: number) => {
-		const graphX = WIDTH / 2;
-		const graphY = HEIGHT / 2;
+		const graphX = cX;
+		const graphY = cY;
 
 		// Draw axes
 		p.stroke(128);
