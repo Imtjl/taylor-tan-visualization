@@ -1,4 +1,4 @@
-import { factorial, taylorSin } from '../src/math';
+import { factorial, taylorCos, taylorSin, taylorTan } from '../src/math';
 
 describe('factorial unit tests', () => {
     test('should return 1 for 0 and 1', () => {
@@ -54,5 +54,67 @@ describe('taylorSin unit tests', () => {
     test('sin(x) increasing on [-𝞹/2; 𝞹/2]', () => {
         expect(taylorSin(-Math.PI / 2)).toBeLessThan(taylorSin(Math.PI / 2));
         expect(taylorSin(-0.3432)).toBeLessThan(taylorSin(0.7345));
+    });
+});
+
+describe('taylorCos unit tests', () => {
+    test('should correctly approximate cos(x) for typical angles', () => {
+        expect(taylorCos(0)).toBeCloseTo(1, 5);
+        expect(taylorCos(Math.PI / 2)).toBeCloseTo(0, 5);
+        expect(taylorCos(-Math.PI / 2)).toBeCloseTo(0, 5);
+        expect(taylorCos(Math.PI)).toBeCloseTo(-1, 3);
+        expect(taylorCos(-Math.PI)).toBeCloseTo(-1, 3);
+    });
+
+    test('cos(x) should be even: cos(-x) = cos(x)', () => {
+        const x1 = 2.345,
+            x2 = 1.234;
+        expect(taylorCos(-x1)).toBeCloseTo(taylorCos(x1), 5);
+        expect(taylorCos(-x2)).toBeCloseTo(taylorCos(x2), 5);
+    });
+
+    test('T = 2π periodicity', () => {
+        // Для улучшения точности используем 20 членов ряда
+        expect(taylorCos(2 * Math.PI, 20)).toBeCloseTo(taylorCos(0, 20), 2);
+        expect(taylorCos(2.5 * Math.PI, 20)).toBeCloseTo(
+            taylorCos(0.5 * Math.PI, 20),
+            1,
+        );
+        expect(taylorCos(3 * Math.PI, 20)).toBeCloseTo(taylorCos(Math.PI, 20), 1);
+        expect(taylorCos(3.5 * Math.PI, 20)).toBeCloseTo(
+            taylorCos(1.5 * Math.PI, 20),
+            1,
+        );
+    });
+
+    test('cos(Infinity) should be NaN', () => {
+        expect(taylorCos(Infinity)).toBeNaN();
+    });
+});
+
+describe('taylorTan unit tests', () => {
+    test('tan(0) should be 0', () => {
+        expect(taylorTan(0)).toBeCloseTo(0, 5);
+    });
+
+    test('should correctly approximate tan(x) for safe x values', () => {
+        const x = 0.5;
+        expect(taylorTan(x)).toBeCloseTo(Math.tan(x), 3);
+    });
+
+    test('tan(x) should be odd: tan(-x) = -tan(x)', () => {
+        const x1 = 0.783,
+            x2 = 1.234;
+        expect(taylorTan(-x1)).toBeCloseTo(-taylorTan(x1), 3);
+        expect(taylorTan(-x2)).toBeCloseTo(-taylorTan(x2), 3);
+    });
+
+    test('tan(Infinity) should be NaN', () => {
+        expect(taylorTan(Infinity)).toBeNaN();
+    });
+
+    test('when cos(x) is close to 0, tan(x) returns NaN', () => {
+        expect(taylorTan(Math.PI / 2)).toBeNaN();
+        expect(taylorTan((3 * Math.PI) / 2)).toBeNaN();
     });
 });
