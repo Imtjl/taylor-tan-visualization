@@ -1,20 +1,31 @@
+<p align="center">
+  <a href="https://github.com/worthant/taylor-tan-visualization/">
+    <picture>
+      <img src="https://github.com/user-attachments/assets/7fd9cef6-c848-446b-ba65-629ba5bec678" height="200">
+    </picture>
+<h1 align="center">
+  Taylor series approximating tan(x) visualization
+</h1>
+  </a>
+</p>
+
 <p align="center">  
  <a aria-label="Node.js Version" href="https://nodejs.org/">
   <img alt="Node.js Version" src="https://img.shields.io/badge/Node.js-20.12.2-brightgreen?style=for-the-badge&logo=node.js&labelColor=000000">
 </a>
-<a aria-label="npm" href="[https://www.erlang.org/](https://www.npmjs.com/)">
-  <img alt="npm" src="https://img.shields.io/badge/npm-10.9.2-blue?style=for-the-badge&logo=npm&labelColor=000000">
+<a aria-label="ts-jest" href="https://kulshekhar.github.io/ts-jest/">
+  <img alt="ts-jest" src="https://img.shields.io/badge/ts--jest-29.2.5-red?style=for-the-badge&logo=jest&labelColor=000000">
 </a>
-<a aria-label="p5.js" href="https://p5js.org/">
-  <img alt="p5.js" src="https://img.shields.io/badge/p5.js-1.11.3-orange?style=for-the-badge&logo=p5.js&labelColor=000000">
+<a aria-label="vite" href="https://vitejs.dev/">
+  <img alt="vite" src="https://img.shields.io/badge/Vite-6.1.0-purple?style=for-the-badge&logo=vite&labelColor=000000">
 </a>
-<a aria-label="Elixir CI" href="https://github.com/Imtjl/fp-red-black-tree-dict-lab2/actions">
-  <img alt="Elixir CI" src="https://img.shields.io/github/actions/workflow/status/Imtjl/fp-red-black-tree-dict-lab2/ci.yml?branch=main&style=for-the-badge&logo=github-actions&labelColor=000000&color=teal">
-</a>
-  <a aria-label="Coverage Status" href="https://coveralls.io/github/Imtjl/fp-red-black-tree-dict-lab2?branch=main">
-    <img alt="Coverage Status" src="https://img.shields.io/coveralls/github/Imtjl/fp-red-black-tree-dict-lab2/main?style=for-the-badge&labelColor=000000&logo=coveralls&color=green">
+  <a aria-label="Coverage Status" href="https://coveralls.io/github/worthant/taylor-tan-visualization?branch=main">
+    <img alt="Coverage Status" src="https://img.shields.io/coveralls/github/worthant/taylor-tan-visualization/main?style=for-the-badge&labelColor=000000&logo=coveralls&color=green">
   </a>
 </p>
+
+|![2025-02-22 03-20-54](https://github.com/user-attachments/assets/cfb6b2de-891b-4258-b29e-b58a7f0776af)|
+|-|
 
 ## Maths behind this repo
 
