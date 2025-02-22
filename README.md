@@ -1,3 +1,21 @@
+<p align="center">  
+ <a aria-label="Node.js Version" href="https://nodejs.org/">
+  <img alt="Node.js Version" src="https://img.shields.io/badge/Node.js-20.12.2-brightgreen?style=for-the-badge&logo=node.js&labelColor=000000">
+</a>
+<a aria-label="npm" href="[https://www.erlang.org/](https://www.npmjs.com/)">
+  <img alt="npm" src="https://img.shields.io/badge/npm-10.9.2-blue?style=for-the-badge&logo=npm&labelColor=000000">
+</a>
+<a aria-label="p5.js" href="https://p5js.org/">
+  <img alt="p5.js" src="https://img.shields.io/badge/p5.js-1.11.3-orange?style=for-the-badge&logo=p5.js&labelColor=000000">
+</a>
+<a aria-label="Elixir CI" href="https://github.com/Imtjl/fp-red-black-tree-dict-lab2/actions">
+  <img alt="Elixir CI" src="https://img.shields.io/github/actions/workflow/status/Imtjl/fp-red-black-tree-dict-lab2/ci.yml?branch=main&style=for-the-badge&logo=github-actions&labelColor=000000&color=teal">
+</a>
+  <a aria-label="Coverage Status" href="https://coveralls.io/github/Imtjl/fp-red-black-tree-dict-lab2?branch=main">
+    <img alt="Coverage Status" src="https://img.shields.io/coveralls/github/Imtjl/fp-red-black-tree-dict-lab2/main?style=for-the-badge&labelColor=000000&logo=coveralls&color=green">
+  </a>
+</p>
+
 ## Maths behind this repo
 
 **Taylor series** of any real or complex-valued function f(x), that is
